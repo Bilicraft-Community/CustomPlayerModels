@@ -99,20 +99,26 @@ public class GuiImpl extends Screen implements IGui {
 			this.matrixStack = null;
 			matrixStack.pop();
 		}
+		matrixStack.push();
+		matrixStack.translate(0.0D, client.getWindow().getScaledHeight() - 48, 0.0D);
 		client.inGameHud.getChatHud().render(matrixStack, client.inGameHud.getTicks());
+		matrixStack.pop();
+	}
+
+	@Override
+	public void removed() {
+		if(vanillaScale >= 0 && vanillaScale != client.options.guiScale) {
+			client.options.guiScale = vanillaScale;
+			vanillaScale = -999;
+			client.onResolutionChanged();
+		}
 	}
 
 	@Override
 	public void onClose() {
-		if(parent != null) {
-			Screen p = parent;
-			parent = null;
-			client.openScreen(p);
-		}
-		if(vanillaScale != -1 && vanillaScale != client.options.guiScale) {
-			client.options.guiScale = vanillaScale;
-			client.onResolutionChanged();
-		}
+		Screen p = parent;
+		parent = null;
+		client.openScreen(p);
 	}
 
 	@Override
@@ -236,9 +242,9 @@ public class GuiImpl extends Screen implements IGui {
 	@Override
 	public void close() {
 		if(closeListener != null) {
-			closeListener.accept(() -> this.client.openScreen((Screen)null));
+			closeListener.accept(this::onClose);
 		} else
-			this.client.openScreen((Screen)null);
+			onClose();
 	}
 
 	@Override
@@ -508,6 +514,7 @@ public class GuiImpl extends Screen implements IGui {
 
 	@Override
 	public void setScale(int value) {
+		if(vanillaScale == -999)return;
 		if(value != client.options.guiScale) {
 			if(vanillaScale == -1)vanillaScale = client.options.guiScale;
 			if(value == -1) {
