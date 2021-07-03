@@ -1,20 +1,15 @@
 package com.tom.cpm.bukkit;
 
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
+import com.tom.cpl.util.Util;
+import com.tom.cpm.shared.MinecraftObjectHolder;
+import com.tom.cpm.shared.config.PlayerData;
+import com.tom.cpm.shared.network.NetH.ServerNetH;
+import com.tom.cpm.shared.network.NetHandler;
+import com.tom.cpm.shared.network.NetHandler.NBTGetter;
+import com.tom.cpm.shared.network.NetHandler.NBTSetter;
+import com.tom.cpm.shared.util.Log;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,17 +19,15 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import com.tom.cpl.util.Util;
-import com.tom.cpm.shared.MinecraftObjectHolder;
-import com.tom.cpm.shared.config.PlayerData;
-import com.tom.cpm.shared.network.NetH.ServerNetH;
-import com.tom.cpm.shared.network.NetHandler;
-import com.tom.cpm.shared.network.NetHandler.NBTGetter;
-import com.tom.cpm.shared.network.NetHandler.NBTSetter;
-import com.tom.cpm.shared.util.Log;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.*;
 
 public class Network implements PluginMessageListener, Listener {
 	public static final String PLAYER_DATA = MinecraftObjectHolder.NETWORK_ID + ":data";
@@ -49,20 +42,9 @@ public class Network implements PluginMessageListener, Listener {
 	public Network(CPMBukkitPlugin plugin) {
 		this.plugin = plugin;
 		try {
-			String pckg;
-			if(Bukkit.getServer() != null) {
-				Field console = Bukkit.getServer().getClass().getDeclaredField("console");
-				console.setAccessible(true);
-				Object dedicatedServer = console.get(Bukkit.getServer());
-				String dedicatedServerClazz = dedicatedServer.getClass().getName();
-				int ind = dedicatedServerClazz.lastIndexOf('.');
-				pckg = dedicatedServerClazz.substring(0, ind + 1);
-			} else {
-				pckg = "net.minecraft.server.v1_16_R3.";
-			}
-			NBTTagCompound = Class.forName(pckg + "NBTTagCompound");
+			NBTTagCompound = net.minecraft.nbt.NBTTagCompound.class;
 
-			PacketDataSerializer = Class.forName(pckg + "PacketDataSerializer");
+			PacketDataSerializer = net.minecraft.network.PacketDataSerializer.class;
 
 			setBoolean = NBTTagCompound.getDeclaredMethod("setBoolean", String.class, boolean.class);
 			setByteArray = NBTTagCompound.getDeclaredMethod("setByteArray", String.class, byte[].class);

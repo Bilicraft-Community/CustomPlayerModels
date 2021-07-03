@@ -7,17 +7,18 @@ version = project.mod_version
 group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'CustomPlayerModels-Bukkit'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '16' // Need this here so eclipse task generates correctly.
 
 repositories {
     mavenCentral()
     maven {
         url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
+    maven{ url = "https://repo.codemc.io/repository/nms/" }
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
+    compileOnly(group: 'org.spigotmc', name: 'spigot', version: '1.17-R0.1-SNAPSHOT')
     compileOnly "io.netty:netty-all:4.1.25.Final"
 }
 
@@ -43,7 +44,7 @@ spigot {
         authors 'tom5454'
         main 'com.tom.cpm.bukkit.CPMBukkitPlugin'
         description 'Customizable Player Models server-side plugin.'
-        apiVersion '1.13'
+        apiVersion '1.17'
         command {
         	named 'cpm'
             description 'Customizable Player Models command'
